@@ -16,6 +16,7 @@ import {
     Scene,
     SphereGeometry,
     TorusGeometry,
+    Vector3,
     WebGLRenderer
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -42,6 +43,7 @@ onMounted(() => {
     */
     controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
+    tick();
 })
 const scene = new Scene()
 scene.background = new Color(0x1a1a1a)
@@ -103,6 +105,37 @@ for (let i = 0; i < 500; i++) {
     stars.add(mesh)
 }
 scene.add(stars)
+
+let rot = 0;
+// 动画
+const axis = new Vector3(0, 0, 1);
+const tick = () => {
+  // 更新渲染器
+  renderer.render(scene, camera);
+  // 给网格模型添加一个转动动画
+  rot += Math.random() * 0.8;
+  const radian = (rot * Math.PI) / 180;
+  // 星球位置动画
+  planet && (planet.rotation.y += .005);
+  // 星球轨道环位置动画
+  ring && ring.rotateOnAxis(axis, Math.PI / 400);
+  // 卫星位置动画
+  satellite.position.x = 250 * Math.sin(radian);
+  satellite.position.y = 100 * Math.cos(radian);
+  satellite.position.z = -100 * Math.cos(radian);
+  satellite.rotation.x += 0.005;
+  satellite.rotation.y += 0.005;
+  satellite.rotation.z -= 0.005;
+  // 星星动画
+  stars.rotation.y += 0.0009;
+  stars.rotation.z -= 0.0003;
+  // 更新控制器
+  controls.update();
+  // 页面重绘时调用自身
+  window.requestAnimationFrame(tick);
+}
+
+
 
 // 页面缩放事件监听
 window.addEventListener('resize', () => {
