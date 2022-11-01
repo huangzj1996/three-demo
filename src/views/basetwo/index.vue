@@ -6,15 +6,19 @@
 import {
     AmbientLight,
     Color,
+    DirectionalLight,
     Fog,
     Group,
     IcosahedronGeometry,
     Mesh,
     MeshLambertMaterial,
+    MeshPhongMaterial,
     MeshToonMaterial,
     PerspectiveCamera,
+    PointLight,
     Scene,
     SphereGeometry,
+    SpotLight,
     TorusGeometry,
     Vector3,
     WebGLRenderer
@@ -43,7 +47,7 @@ onMounted(() => {
     */
     controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
-    tick();
+    tick()
 })
 const scene = new Scene()
 scene.background = new Color(0x1a1a1a)
@@ -55,9 +59,9 @@ color: 表示雾的颜色，如设置为白色，场景中远处物体为蓝色�
 near：表示应用雾化效果的最小距离，距离活动摄像机长度小于 near 的物体将不会被雾所影响。
 far：表示应用雾化效果的最大距离，距离活动摄像机长度大于 far 的物体将不会被雾所影响。
 */
-scene.fog = new Fog(0x1a1a1a, 1, 1000)
+scene.fog = new Fog(0x4169e1, 1, 1000)
 // AmbientLight 环境光，它是一种基础光源，整个场景中的物体都将接收它的颜色。其中两个参数分别代表光照的颜色和强度。
-const light = new AmbientLight(0xdeedff, 1.5)
+const light = new DirectionalLight(0x8b1a1a, 13.5)
 scene.add(light)
 
 const camera = new PerspectiveCamera(40, sizes.width / sizes.height)
@@ -66,31 +70,32 @@ camera.position.set(20, 100, 450)
 
 // 先创建立方体和材质，再用它们生成网格模型，最后将它添加到场景中即可。
 // 星球模型使用了非光泽表面材质 MeshLambertMaterial，立方体采用 SphereGeometry 生成。
-const SphereMaterial = new MeshLambertMaterial({
+const SphereMaterial = new MeshToonMaterial({
     color: 0x03c03c,
     // 几何模型的线框结构
     wireframe: true
 })
-
-const sphereGeometry = new SphereGeometry(80, 32, 32)
+const sphereGeometry = new SphereGeometry(100, 32, 32)
 const planet = new Mesh(sphereGeometry, SphereMaterial)
 scene.add(planet)
 
+// 光环
 const torusGeometry = new TorusGeometry(150, 8, 2, 120)
 const torusMaterial = new MeshLambertMaterial({
     color: 0x40a9ff,
     wireframe: true
 })
-
 const ring = new Mesh(torusGeometry, torusMaterial)
 ring.rotation.x = Math.PI / 2
 ring.rotation.y = -0.1 * (Math.PI / 2)
 scene.add(ring)
 
+// 卫星
 const IcoGeometry = new IcosahedronGeometry(16, 0)
 const IcoMaterial = new MeshToonMaterial({ color: 0xfffc00 })
 const satellite = new Mesh(IcoGeometry, IcoMaterial)
 scene.add(satellite)
+// 星星
 const stars = new Group()
 for (let i = 0; i < 500; i++) {
     const geometry = new IcosahedronGeometry(Math.random() * 2, 0)
@@ -106,36 +111,34 @@ for (let i = 0; i < 500; i++) {
 }
 scene.add(stars)
 
-let rot = 0;
+let rot = 0
 // 动画
-const axis = new Vector3(0, 0, 1);
+const axis = new Vector3(0, 0, 1)
 const tick = () => {
-  // 更新渲染器
-  renderer.render(scene, camera);
-  // 给网格模型添加一个转动动画
-  rot += Math.random() * 0.8;
-  const radian = (rot * Math.PI) / 180;
-  // 星球位置动画
-  planet && (planet.rotation.y += .005);
-  // 星球轨道环位置动画
-  ring && ring.rotateOnAxis(axis, Math.PI / 400);
-  // 卫星位置动画
-  satellite.position.x = 250 * Math.sin(radian);
-  satellite.position.y = 100 * Math.cos(radian);
-  satellite.position.z = -100 * Math.cos(radian);
-  satellite.rotation.x += 0.005;
-  satellite.rotation.y += 0.005;
-  satellite.rotation.z -= 0.005;
-  // 星星动画
-  stars.rotation.y += 0.0009;
-  stars.rotation.z -= 0.0003;
-  // 更新控制器
-  controls.update();
-  // 页面重绘时调用自身
-  window.requestAnimationFrame(tick);
+    // 更新渲染器
+    renderer.render(scene, camera)
+    // 给网格模型添加一个转动动画
+    rot += Math.random() * 0.8
+    const radian = (rot * Math.PI) / 180
+    // 星球位置动画
+    planet && (planet.rotation.y += 0.005)
+    // 星球轨道环位置动画
+    ring && ring.rotateOnAxis(axis, Math.PI / 400)
+    // 卫星位置动画
+    satellite.position.x = 250 * Math.sin(radian)
+    satellite.position.y = 100 * Math.cos(radian)
+    satellite.position.z = -100 * Math.cos(radian)
+    satellite.rotation.x += 0.005
+    satellite.rotation.y += 0.005
+    satellite.rotation.z -= 0.005
+    // 星星动画
+    stars.rotation.y += 0.0009
+    stars.rotation.z -= 0.0003
+    // 更新控制器
+    controls.update()
+    // 页面重绘时调用自身
+    window.requestAnimationFrame(tick)
 }
-
-
 
 // 页面缩放事件监听
 window.addEventListener('resize', () => {

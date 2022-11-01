@@ -3,6 +3,7 @@
 // import Board from './components/Board.vue'
 import BaseOne from './views/baseone/index.vue';
 import BaseTwo from './views/basetwo/index.vue';
+import BaseThree from './views/baseThree/index.vue';
 </script>
 
 <template>
@@ -10,7 +11,8 @@ import BaseTwo from './views/basetwo/index.vue';
         <!-- <Board></Board>
         <CanvaBoard></CanvaBoard> -->
         <!-- <BaseOne></BaseOne> -->
-        <BaseTwo></BaseTwo>
+        <!-- <BaseTwo></BaseTwo> -->
+        <BaseThree></BaseThree>
     </main>
 </template>
 
